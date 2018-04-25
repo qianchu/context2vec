@@ -21,7 +21,7 @@ else
 fi
 
 
-
+echo 'all pack installed'
 # pack python project
 cd /home/context-embed/context2vec
 python setup.py install

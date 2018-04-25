@@ -1,1 +1,7 @@
+DS_Store
 model_dir/*
+MODEL*
+*.log
+data/*
+build/*
+corpus_dir/*
