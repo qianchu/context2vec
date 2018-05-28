@@ -1,31 +1,30 @@
+#run inside the docker nvidia-docker run  --name context2vec-gpu -it -p 8888:8888 -v /home/ql261/simp2trad/:/home/simp2trad/ chainer/chainer:v4.0.0-python2-lqc /bin/bash 
+
+#install optional
+# sudo apt-get update
+# sudo apt-get upgrade
+# sudo apt-get install git
+git config --global user.email "hey_flora@126.com"
+git config --global user.name "qianchu"
+
 # set up bash shell
-export SHELL=/bin/bash
-cd /home/context-embed
-# run in the docker image: continuumio/anaconda
-
-# configure environment
-env=context2vec
-dir="/opt/conda/envs/$env"
-if [ -d "$dir" ]
-then
-	echo "$dir found."
-	source activate $env
-        conda info --envs
-else
-    echo "$dir not found."
-    conda create --name $env
-    source activate $env
-    apt-get install vim
-    pip install chainer==1.7
-
-fi
-
-
-echo 'all pack installed'
 # pack python project
-cd /home/context-embed/context2vec
-python setup.py install
+cd /home/rare_we/context2vec
+sudo python setup.py install
 
 # run jupyter
-cd /home/context-embed
-jupyter notebook --ip '*' --port=8882 --allow-root &
+cd /home/
+sudo chmod -R 777 ./*
+cd /home/rare_we/
+# sudo python -m pip install --upgrade pip
+# sudo python -m pip install jupyter
+# sudo python -m pip install pandas
+
+if [ ! -d '/root/.jupyter/' ]; then
+    sudo mkdir /root/.jupyter/
+fi
+#cp /home/simp2trad/bivec/jupyter_notebook_config.py /root/.jupyter/
+for pid in $(ps -def | grep jupyter | awk '{print $2}'); do sudo kill -9 $pid; done
+
+export SHELL=/bin/bash
+jupyter notebook --ip '*'  --port=8887 --allow-root &
