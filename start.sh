@@ -11,7 +11,10 @@ git config --global user.name "qianchu"
 # pack python project
 cd /home/rare_we/context2vec
 sudo python setup.py install
-
+sudo pip install -U scipy
+sudo pip install -U scikit-learn
+sudo pip install matplotlib
+sudo pip install nltk
 # run jupyter
 cd /home/
 sudo chmod -R 777 ./*
@@ -20,10 +23,11 @@ cd /home/rare_we/
 # sudo python -m pip install jupyter
 # sudo python -m pip install pandas
 
-if [ ! -d '/root/.jupyter/' ]; then
-    sudo mkdir /root/.jupyter/
+if [ ! -d '/home/ql261/.jupyter/' ]; then
+    sudo mkdir /home/ql261/.jupyter/
 fi
-#cp /home/simp2trad/bivec/jupyter_notebook_config.py /root/.jupyter/
+sudo cp /home/rare_we/context2vec/jupyter_notebook_config.py /home/ql261/.jupyter/
+
 for pid in $(ps -def | grep jupyter | awk '{print $2}'); do sudo kill -9 $pid; done
 
 export SHELL=/bin/bash
