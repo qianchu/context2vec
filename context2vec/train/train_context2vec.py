@@ -132,7 +132,7 @@ for epoch in range(args.epoch):
 
     reader.open()    
     for sent in reader.next_batch():
-
+        print '.'
         model.zerograds()
         loss = model(sent)
         accum_loss += loss.data
@@ -158,22 +158,22 @@ for epoch in range(args.epoch):
     print 'accum words per epoch', word_count, 'accum_loss', accum_loss, 'accum_loss/word', accum_mean_loss
     reader.close()
     
-if args.wordsfile != None:        
-    dump_embeddings(args.wordsfile+'.targets', model.loss_func.W.data, target_word_units, reader.index2word)
+    if args.wordsfile != None:        
+        dump_embeddings(args.wordsfile+'.targets.{0}'.format(epoch), model.loss_func.W.data, target_word_units, reader.index2word)
 
-if args.modelfile != None:
-    S.save_npz(args.modelfile, model)
-    
-with open(args.modelfile + '.params', 'w') as f:
-    f.write('model_file\t' + args.modelfile[args.modelfile.rfind('/')+1:]+'\n')
-    f.write('words_file\t' + args.wordsfile[args.wordsfile.rfind('/')+1:]+'.targets\n')
-    f.write('unit\t' + str(args.unit)+'\n')
-    if args.deep:
-        f.write('deep\tyes\n')
-    else:
-        f.write('deep\tno\n')
-    f.write('drop_ratio\t' + str(args.dropout)+'\n')    
-    f.write('#\t{}\n'.format(' '.join(sys.argv)))
+    if args.modelfile != None:
+        S.save_npz(args.modelfile+'.{0}'.format(epoch), model)
+
+    with open(args.modelfile + '.params', 'w') as f:
+        f.write('model_file\t' + args.modelfile[args.modelfile.rfind('/')+1:]+'.{0}\n'.format(epoch))
+        f.write('words_file\t' + args.wordsfile[args.wordsfile.rfind('/')+1:]+'.targets.{0}\n'.format(epoch))
+        f.write('unit\t' + str(args.unit)+'\n')
+        if args.deep:
+            f.write('deep\tyes\n')
+        else:
+            f.write('deep\tno\n')
+        f.write('drop_ratio\t' + str(args.dropout)+'\n')    
+        f.write('#\t{}\n'.format(' '.join(sys.argv)))
     
     
 
