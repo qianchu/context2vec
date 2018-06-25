@@ -138,6 +138,8 @@ class BiLstmContext(chainer.Chain):
         return sent_y[position].data[0]           
         
     def _contexts_rep(self, sent_arr):
+      with chainer.using_config('train', self.train):
+
         
         batchsize = len(sent_arr)
         
@@ -153,7 +155,7 @@ class BiLstmContext(chainer.Chain):
             c = chainer.Variable(l2r_sent[:,i])
             e = self.l2r_embed(c)            
             if self.drop_ratio > 0.0:
-                h = self.l2r_1(F.dropout(e, ratio=self.drop_ratio, train=self.train))
+                h = self.l2r_1(F.dropout(e, ratio=self.drop_ratio))
             else:
                 h = self.l2r_1(e)
             l2r_sent_h.append(h)
@@ -164,7 +166,7 @@ class BiLstmContext(chainer.Chain):
             c = chainer.Variable(r2l_sent[:,i])
             e = self.r2l_embed(c)
             if self.drop_ratio > 0.0:
-                h = self.r2l_1(F.dropout(e, ratio=self.drop_ratio, train=self.train))
+                h = self.r2l_1(F.dropout(e, ratio=self.drop_ratio))
             else:
                 h = self.r2l_1(e)
             r2l_sent_h.append(h)
@@ -179,8 +181,8 @@ class BiLstmContext(chainer.Chain):
         for l2r_h, r2l_h in izip(l2r_sent_h, r2l_sent_h):
             if not self.deep: # projecting hidden state to half out-units dimensionality before concatenating
                 if self.drop_ratio > 0.0:
-                    l2r_h = self.lp_l2r(F.dropout(l2r_h, ratio=self.drop_ratio, train=self.train))
-                    r2l_h = self.lp_r2l(F.dropout(r2l_h, ratio=self.drop_ratio, train=self.train))
+                    l2r_h = self.lp_l2r(F.dropout(l2r_h, ratio=self.drop_ratio))
+                    r2l_h = self.lp_r2l(F.dropout(r2l_h, ratio=self.drop_ratio))
                 else:
                     l2r_h = self.lp_l2r(l2r_h)
                     r2l_h = self.lp_r2l(r2l_h)
@@ -193,8 +195,8 @@ class BiLstmContext(chainer.Chain):
             sent_y = []
             for bi_h in sent_bi_h:
                 if self.drop_ratio > 0.0:
-                    h1 = F.relu(self.l3(F.dropout(bi_h, ratio=self.drop_ratio, train=self.train)))
-                    y = self.l4(F.dropout(h1, ratio=self.drop_ratio, train=self.train))
+                    h1 = F.relu(self.l3(F.dropout(bi_h, ratio=self.drop_ratio)))
+                    y = self.l4(F.dropout(h1, ratio=self.drop_ratio))
                 else:
                     h1 = F.relu(self.l3(bi_h))
                     y = self.l4(h1)
