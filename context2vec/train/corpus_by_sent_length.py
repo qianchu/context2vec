@@ -16,7 +16,7 @@ def get_file(sub_files, corpus_dir, num_filename):
    
 
 if __name__ == '__main__':
-    
+    counter=0
     if len(sys.argv) < 2:
         print "usage: %s <corpus-file> [max-sent-len]"  % (sys.argv[0])
         sys.exit(1)
@@ -39,6 +39,9 @@ if __name__ == '__main__':
     word_counts = Counter()
     
     for line in corpus_file:
+        if counter%10000==0 and counter>=10000:
+            print ('.'),
+        counter+=1
         words = line.strip().lower().split()
         wordnum = len(words)
         if wordnum > 1 and wordnum <= max_sent_len:
