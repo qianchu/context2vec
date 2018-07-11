@@ -35,6 +35,8 @@ def dump_comp_graph(filename, vs):
 def parse_arguments():
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--learning_rate','-l',default=0.001,help='initial learning rate')
+
     parser.add_argument('--indir', '-i',
                         default=None,
                         help='input corpus directory')
@@ -115,7 +117,8 @@ if args.context == 'lstm':
 else:
     raise Exception('Unknown context type: {}'.format(args.context))
 
-optimizer = O.Adam()
+optimizer = O.Adam(alpha=float(args.learning_rate))
+# optimizer=O.Adam()
 optimizer.setup(model)
 
 STATUS_INTERVAL = 1000000
@@ -132,7 +135,7 @@ for epoch in range(args.epoch):
 
     reader.open()    
     for sent in reader.next_batch():
-        print '.'
+        print '.',
         model.zerograds()
         loss = model(sent)
         accum_loss += loss.data
@@ -164,7 +167,7 @@ for epoch in range(args.epoch):
     if args.modelfile != None:
         S.save_npz(args.modelfile+'.{0}'.format(epoch), model)
 
-    with open(args.modelfile + '.params', 'w') as f:
+    with open(args.modelfile + '.params.{0}'.format(epoch), 'w') as f:
         f.write('model_file\t' + args.modelfile[args.modelfile.rfind('/')+1:]+'.{0}\n'.format(epoch))
         f.write('words_file\t' + args.wordsfile[args.wordsfile.rfind('/')+1:]+'.targets.{0}\n'.format(epoch))
         f.write('unit\t' + str(args.unit)+'\n')
