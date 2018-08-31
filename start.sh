@@ -9,7 +9,7 @@ git config --global user.name "qianchu"
 
 # set up bash shell
 # pack python project
-cd /home/rare_we/models/context2vec
+cd /home/incontext_lexsub/models/context2vec
 sudo python setup.py install
 sudo pip install -U scipy
 sudo pip install -U scikit-learn
@@ -18,7 +18,7 @@ sudo pip install nltk
 # run jupyter
 cd /home/
 sudo chmod -R 777 ./*
-cd /home/rare_we/
+cd /home/incontext_lexsub
 # sudo python -m pip install --upgrade pip
 # sudo python -m pip install jupyter
 # sudo python -m pip install pandas
@@ -26,9 +26,9 @@ cd /home/rare_we/
 if [ ! -d '/home/ql261/.jupyter/' ]; then
     sudo mkdir /home/ql261/.jupyter/
 fi
-sudo cp /home/rare_we/models/context2vec/jupyter_notebook_config.py /home/ql261/.jupyter/
+sudo cp /home/incontext_lexsub/models/context2vec/jupyter_notebook_config.py /home/ql261/.jupyter/
 
 for pid in $(ps -def | grep jupyter | awk '{print $2}'); do sudo kill -9 $pid; done
 
 export SHELL=/bin/bash
-jupyter notebook --ip '*'  --port=8887 --allow-root &
+jupyter notebook --ip '*'  --port=8884 --allow-root &
