@@ -10,6 +10,7 @@ git config --global user.name "qianchu"
 # set up bash shell
 # pack python project
 cd /home/incontext_lexsub/models/context2vec
+export PYTHONPATH=":/home/incontext_lexsub/eval/lexsub_en"
 sudo python setup.py install
 sudo pip install -U scipy
 sudo pip install -U scikit-learn
