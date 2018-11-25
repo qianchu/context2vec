@@ -1,11 +1,12 @@
+
 import numpy
 from chainer import cuda
 import chainer.serializers as S
 import chainer.links as L
-#from nltk.corpus import stopwords
+from nltk.corpus import stopwords
 
-from context_models import CbowContext, BiLstmContext
-from defs import IN_TO_OUT_UNITS_RATIO, NEGATIVE_SAMPLING_NUM
+from .context_models import CbowContext, BiLstmContext
+from .defs import IN_TO_OUT_UNITS_RATIO, NEGATIVE_SAMPLING_NUM
 
 
 class ModelReader(object):
@@ -13,14 +14,12 @@ class ModelReader(object):
     Reads a pre-trained model using a config file
     '''
 
-    def __init__(self, config_file,gpu=-1):
-        self.gpu = gpu # todo support gpu
-        print 'Reading config file: ' + config_file
+    def __init__(self, config_file, gpu=-1):
+        self.gpu = gpu  # todo support gpu
+        print('Reading config file: ' + config_file)
         params = self.read_config_file(config_file)
-        print 'Config: ', params
+        print('Config: ', params)
         self.w, self.word2index, self.index2word, self.model = self.read_model(params)
-        
-
 
     def read_config_file(self, filename):
         
@@ -147,4 +146,5 @@ class ModelReader(object):
 
 
 
+>>>>>>> upstream/master
         

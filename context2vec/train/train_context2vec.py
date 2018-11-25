@@ -12,6 +12,7 @@ import chainer.links as L
 import chainer.optimizers as O
 import chainer.serializers as S
 import chainer.computational_graph as C
+from chainer.optimizer_hooks import GradientClipping
 
 from sentence_reader import SentenceReaderDir
 from context2vec.common.context_models import BiLstmContext
@@ -69,6 +70,10 @@ def parse_arguments():
     parser.add_argument('--deep', '-d', choices=['yes', 'no'],
                         default=None,
                         help='use deep NN architecture')
+    parser.add_argument('--alpha', '-a', default=0.001, type=float,
+                        help='alpha param for Adam, controls the learning rate')
+    parser.add_argument('--grad-clip', '-gc', default=None, type=float,
+                        help='if specified, clip l2 of the gradient to this value')
     
     args = parser.parse_args()
     
@@ -88,6 +93,8 @@ def parse_arguments():
     print('Dropout: {}'.format(args.dropout))
     print('Trimfreq: {}'.format(args.trimfreq))
     print('NS Power: {}'.format(args.ns_power))
+    print('Alpha: {}'.format(args.alpha))
+    print('Grad clip: {}'.format(args.grad_clip))
     print('')
        
     return args 
@@ -118,8 +125,11 @@ else:
     raise Exception('Unknown context type: {}'.format(args.context))
 
 optimizer = O.Adam(alpha=float(args.learning_rate))
-# optimizer=O.Adam()
+
 optimizer.setup(model)
+
+if args.grad_clip:
+    optimizer.add_hook(GradientClipping(args.grad_clip))
 
 STATUS_INTERVAL = 1000000
 
@@ -135,7 +145,7 @@ for epoch in range(args.epoch):
 
     reader.open()    
     for sent in reader.next_batch():
-        print '.',
+        print ('.'),
         model.zerograds()
         loss = model(sent)
         accum_loss += loss.data
@@ -158,7 +168,7 @@ for epoch in range(args.epoch):
             last_accum_loss = float(accum_loss)
             last_word_count = word_count
 
-    print 'accum words per epoch', word_count, 'accum_loss', accum_loss, 'accum_loss/word', accum_mean_loss
+    print('accum words per epoch', word_count, 'accum_loss', accum_loss, 'accum_loss/word', accum_mean_loss)
     reader.close()
     
     if args.wordsfile != None:        

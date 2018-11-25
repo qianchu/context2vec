@@ -1,5 +1,4 @@
 import math
-from itertools import izip
 
 import numpy as np
 import chainer
@@ -35,15 +34,15 @@ class CbowContext(object):
         bow = self.extract_window(sent_words, position)
         bow_inds = [self.word2index[word] for word in bow if word in self.word2index and word not in self.stopwords ]
         if len(bow_inds) == 0:
-            print "NOTICE: Empty bow context for: " + str(sent_words)
-            print "Trying with stopwords"
+            print("NOTICE: Empty bow context for: " + str(sent_words))
+            print("Trying with stopwords")
             bow_inds = [self.word2index[word] for word in bow if word in self.word2index ]           
         return self.context_rep(bow_inds)
     
     def count2idf(self, word_counts, word2index):
         sum_counts = sum(word_counts.values())
         idf = np.zeros((len(word2index),1), dtype=float)
-        for word, count in word_counts.iteritems():
+        for word, count in word_counts.items():
             if word in word2index:
                 idf[word2index[word],0] = math.log(float(sum_counts)/count)
         return idf
@@ -93,8 +92,8 @@ class BiLstmContext(chainer.Chain):
                 loss_func=loss_func,
                 l2r_1 = L.LSTM(in_units, hidden_units),
                 r2l_1 = L.LSTM(in_units, hidden_units),
-                lp_l2r = L.Linear(hidden_units, out_units/2),
-                lp_r2l = L.Linear(hidden_units, out_units/2)
+                lp_l2r = L.Linear(hidden_units, int(out_units/2)),
+                lp_r2l = L.Linear(hidden_units, int(out_units/2))
                 
             )
         if gpu >=0:
@@ -138,8 +137,6 @@ class BiLstmContext(chainer.Chain):
         return sent_y[position].data[0]           
         
     def _contexts_rep(self, sent_arr):
-      with chainer.using_config('train', self.train):
-
         
         batchsize = len(sent_arr)
         
@@ -155,7 +152,7 @@ class BiLstmContext(chainer.Chain):
             c = chainer.Variable(l2r_sent[:,i])
             e = self.l2r_embed(c)            
             if self.drop_ratio > 0.0:
-                h = self.l2r_1(F.dropout(e, ratio=self.drop_ratio))
+                h = self.l2r_1(F.dropout(e, ratio=self.drop_ratio, train=self.train))
             else:
                 h = self.l2r_1(e)
             l2r_sent_h.append(h)
@@ -166,7 +163,7 @@ class BiLstmContext(chainer.Chain):
             c = chainer.Variable(r2l_sent[:,i])
             e = self.r2l_embed(c)
             if self.drop_ratio > 0.0:
-                h = self.r2l_1(F.dropout(e, ratio=self.drop_ratio))
+                h = self.r2l_1(F.dropout(e, ratio=self.drop_ratio, train=self.train))
             else:
                 h = self.r2l_1(e)
             r2l_sent_h.append(h)
@@ -178,11 +175,11 @@ class BiLstmContext(chainer.Chain):
         
         # concat left-to-right with right-to-left
         sent_bi_h = []
-        for l2r_h, r2l_h in izip(l2r_sent_h, r2l_sent_h):
+        for l2r_h, r2l_h in zip(l2r_sent_h, r2l_sent_h):
             if not self.deep: # projecting hidden state to half out-units dimensionality before concatenating
                 if self.drop_ratio > 0.0:
-                    l2r_h = self.lp_l2r(F.dropout(l2r_h, ratio=self.drop_ratio))
-                    r2l_h = self.lp_r2l(F.dropout(r2l_h, ratio=self.drop_ratio))
+                    l2r_h = self.lp_l2r(F.dropout(l2r_h, ratio=self.drop_ratio, train=self.train))
+                    r2l_h = self.lp_r2l(F.dropout(r2l_h, ratio=self.drop_ratio, train=self.train))
                 else:
                     l2r_h = self.lp_l2r(l2r_h)
                     r2l_h = self.lp_r2l(r2l_h)
@@ -195,8 +192,8 @@ class BiLstmContext(chainer.Chain):
             sent_y = []
             for bi_h in sent_bi_h:
                 if self.drop_ratio > 0.0:
-                    h1 = F.relu(self.l3(F.dropout(bi_h, ratio=self.drop_ratio)))
-                    y = self.l4(F.dropout(h1, ratio=self.drop_ratio))
+                    h1 = F.relu(self.l3(F.dropout(bi_h, ratio=self.drop_ratio, train=self.train)))
+                    y = self.l4(F.dropout(h1, ratio=self.drop_ratio, train=self.train))
                 else:
                     h1 = F.relu(self.l3(bi_h))
                     y = self.l4(h1)
@@ -219,9 +216,10 @@ class BiLstmContext(chainer.Chain):
             sent_x.append(x)
             
         accum_loss = None
-        for y,x in izip(sent_y, sent_x):
+        for y,x in zip(sent_y, sent_x):
             loss = self.loss_func(y, x)
             accum_loss = accum_loss + loss if accum_loss is not None else loss 
         
         return accum_loss
 
+>>>>>>> upstream/master
