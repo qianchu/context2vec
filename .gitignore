@@ -1,6 +1,6 @@
 .Trash-1000/
 *.ipynb_checkpoints/
-DS_Store
+*DS_Store
 model_dir/*
 MODEL*
 *.log
