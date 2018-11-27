@@ -60,7 +60,7 @@ class ModelReader(object):
         drop_ratio = float(params['drop_ratio'])
         
         #read and normalize target word embeddings
-        w, word2index, index2word = self.read_words(words_file) 
+        w, word2index, index2word = self.read_words(words_file)
         s = numpy.sqrt((w * w).sum(1))
         s[s==0.] = 1.
         w /= s.reshape((s.shape[0], 1))  # normalize
@@ -144,7 +144,3 @@ class ModelReader(object):
 
     
 
-
-
->>>>>>> upstream/master
-        

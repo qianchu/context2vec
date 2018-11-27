@@ -222,4 +222,3 @@ class BiLstmContext(chainer.Chain):
         
         return accum_loss
 
->>>>>>> upstream/master
